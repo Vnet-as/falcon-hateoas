@@ -1,0 +1,2 @@
+setuptools>=17.1
+flake8
