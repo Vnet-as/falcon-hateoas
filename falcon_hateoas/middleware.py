@@ -7,7 +7,7 @@ class AlchemyJSONEncoder(json.JSONEncoder):
     def default(self, o):
         # if isinstance(getattr(o, 'metadata'), sqlalchemy.schema.MetaData):
         if issubclass(o.__class__,
-                      sqlalchemy.ext.declarative.DeclarativeMeta.__class__):
+                      sqlalchemy.ext.declarative.DeclarativeMeta):
             d = {}
             for col in o.__table__.columns.keys():
                 if hasattr(getattr(o, col), 'isoformat'):
