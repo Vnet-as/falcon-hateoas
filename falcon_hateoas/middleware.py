@@ -4,10 +4,15 @@ import sqlalchemy
 
 
 class AlchemyJSONEncoder(json.JSONEncoder):
+    def _is_alchemy_object(self, obj):
+        try:
+            sqlalchemy.orm.base.object_mapper(obj)
+            return True
+        except sqlalchemy.orm.exc.UnmappedInstanceError:
+            return False
+
     def default(self, o):
-        # if isinstance(getattr(o, 'metadata'), sqlalchemy.schema.MetaData):
-        if issubclass(o.__class__,
-                      sqlalchemy.ext.declarative.DeclarativeMeta):
+        if self._is_alchemy_object(o):
             d = {}
             for col in o.__table__.columns.keys():
                 if hasattr(getattr(o, col), 'isoformat'):
