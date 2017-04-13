@@ -29,7 +29,7 @@ class ModelCollection:
             if column is not None:
                 filter.append(column == v)
             else:
-                split = k.rsplit('_', 1)
+                split = k.rsplit('__', 1)
                 if len(split) != 2:
                     continue
                 else:
