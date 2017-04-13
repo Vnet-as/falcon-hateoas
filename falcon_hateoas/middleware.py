@@ -1,5 +1,6 @@
 import json
 import decimal
+import datetime
 import sqlalchemy
 
 
@@ -14,13 +15,15 @@ class AlchemyJSONEncoder(json.JSONEncoder):
     def default(self, o):
         if self._is_alchemy_object(o):
             d = {}
-            for col in o.__table__.columns.keys():
-                if hasattr(getattr(o, col), 'isoformat'):
-                    d[col] = getattr(o, col).isoformat()
-                elif isinstance(getattr(o, col), decimal.Decimal):
-                    d[col] = float(getattr(o, col))
+            for col_name, col in o.__table__.columns.items():
+                if hasattr(col, 'isoformat'):
+                    d[col_name] = col.isoformat()
+                elif isinstance(col, datetime.timedelta):
+                    d[col_name] = str(col)
+                elif isinstance(col, decimal.Decimal):
+                    d[col_name] = float(col)
                 else:
-                    d[col] = getattr(o, col)
+                    d[col_name] = col
             return d
         else:
             return super(AlchemyJSONEncoder, self).default(o)

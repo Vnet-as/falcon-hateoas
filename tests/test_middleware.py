@@ -21,9 +21,11 @@ class TestJsonMiddleware(TestCase):
     @mock.patch('sqlalchemy.ext.declarative.DeclarativeMeta')
     def test_alchemy_model(self, alchemy_mock):
         testdate = datetime.datetime.today()
+        testinterval = datetime.timedelta(1, 2, 30, 40, 5, 6, 1)
         alchemy_mock.__table__ = mock.Mock()
         alchemy_mock.__table__.columns = {
             'testdate': testdate,
+            'testinterval': testinterval,
             'testdecimal': decimal.Decimal('10.1'),
             'teststr': 'teststring'
         }
@@ -33,6 +35,7 @@ class TestJsonMiddleware(TestCase):
         resp = self.simulate_get()
         assert resp.json == {
                 'testdate': testdate.isoformat(),
+                'testinterval': '8 days, 6:05:02.040030',
                 'testdecimal': 10.1,
                 'teststr': 'teststring'
         }
