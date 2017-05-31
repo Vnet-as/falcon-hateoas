@@ -11,10 +11,10 @@ from falcon_hateoas.middleware import JsonMiddleware
 class TestJsonMiddleware(TestCase):
 
     def setUp(self):
-        self.api = falcon.API(middleware=JsonMiddleware())
+        self.app = falcon.API(middleware=JsonMiddleware())
 
     def test_basic_data(self):
-        self.api.add_route('/', SimpleTestResource(body={'a': 1}))
+        self.app.add_route('/', SimpleTestResource(body={'a': 1}))
         resp = self.simulate_get()
         assert resp.json == {'a': 1}
 
@@ -31,7 +31,7 @@ class TestJsonMiddleware(TestCase):
         }
         alchemy_mock.__dict__.update(alchemy_mock.__table__.columns)
 
-        self.api.add_route('/', SimpleTestResource(body=alchemy_mock))
+        self.app.add_route('/', SimpleTestResource(body=alchemy_mock))
         resp = self.simulate_get()
         assert resp.json == {
                 'testdate': testdate.isoformat(),
