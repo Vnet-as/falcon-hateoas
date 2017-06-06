@@ -1,17 +1,22 @@
 import falcon
+import json
 import sqlalchemy
+from .decorators import db_session
 
 
 class ModelCollection:
+    def __init__(self, sessionmaker=None):
+        self.sessionmaker = sessionmaker
 
-    def on_get(self, req, resp):
+    @db_session
+    def on_get(self, req, resp, dbsession):
         params = {
             'limit': None,
             'offset': 0,
             'order_by': None
         }
         params.update(req.params)
-        result = self.session.query(self.model_class)
+        result = dbsession.query(self.model_class)
         filter = self._prepare_filter(params)
         if len(filter) > 0:
             result = result.filter(*filter)
@@ -57,9 +62,12 @@ class ModelCollection:
 
 
 class ModelResource:
+    def __init__(self, sessionmaker=None):
+        self.sessionmaker = sessionmaker
 
-    def on_get(self, req, resp, **kwargs):
-        result = self.session.query(self.model_class)
+    @db_session
+    def on_get(self, req, resp, dbsession, **kwargs):
+        result = dbsession.query(self.model_class)
         result = result.filter_by(**kwargs)
         try:
             resp.body = result.one()
