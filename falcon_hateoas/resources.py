@@ -27,6 +27,17 @@ class ModelCollection:
         result = result.offset(params['offset'])
         resp.body = result.all()
 
+    @db_session
+    def on_post(self, req, resp, dbsession):
+        resource = self.model_class()
+        data = json.loads(req.bounded_stream.read().decode())
+        for k, v in data.items():
+            if hasattr(self.model_class.__table__.columns, k):
+                setattr(resource, k, v)
+        dbsession.add(resource)
+        dbsession.commit()
+        resp.body = resource
+
     def _prepare_filter(self, params):
         filter = []
         for k, v in params.items():
