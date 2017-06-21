@@ -68,6 +68,26 @@ class TestModelResource:
         resp = testing.simulate_post(app, '/123', body='somedata')
         assert resp.status_code == 405
 
+    def test_patch(self, app):
+        res = app._router.find('/123')[0]
+        res.model_class.__table__.columns.some_str = str
+        session = res.sessionmaker()
+        res.sessionmaker.return_value.query.return_value.filter_by\
+            .return_value.one.side_effect = None
+        # res.sessionmaker.return_value.query.return_value.filter_by\
+        #     .return_value.one.return_value = 123
+        patch_data = {'some_str': 'thing'}
+        resp = testing.simulate_patch(app, '/123', body=json.dumps(patch_data))
+        assert resp.status_code == 200
+        calls = [
+            mock.call.query(res.model_class),
+            mock.call.query().filter_by(res_id='123'),
+            mock.call.query().filter_by().one(),
+            mock.call.commit(),
+            mock.call.close()
+        ]
+        assert session.mock_calls == calls
+
 
 class TestModelCollection:
     def test_basic_test(self, app):
