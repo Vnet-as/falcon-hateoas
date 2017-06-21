@@ -85,3 +85,21 @@ class ModelResource:
             resp.body = result.one()
         except sqlalchemy.orm.exc.NoResultFound:
             raise falcon.HTTPNotFound
+
+    @db_session
+    def on_patch(self, req, resp, dbsession, **kwargs):
+        result = dbsession.query(self.model_class)
+        result = result.filter_by(**kwargs)
+        try:
+            resource = result.one()
+        except sqlalchemy.orm.exc.NoResultFound:
+            raise falcon.HTTPNotFound
+        data = json.loads(req.bounded_stream.read().decode())
+        for k, v in data.items():
+            if hasattr(self.model_class.__table__.columns, k):
+                setattr(resource, k, v)
+            else:
+                raise falcon.HTTPBadRequest(
+                    description=('Resource does not contain field'
+                                 '"{}"'.format(k)))
+        dbsession.commit()
