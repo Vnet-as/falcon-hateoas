@@ -36,6 +36,7 @@ class ModelCollection:
                 setattr(resource, k, v)
         dbsession.add(resource)
         dbsession.commit()
+        dbsession.refresh(resource)
         resp.body = resource
 
     def _prepare_filter(self, params):

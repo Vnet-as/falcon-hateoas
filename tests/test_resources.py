@@ -149,6 +149,11 @@ class TestModelCollection:
         assert res.model_class.called
         assert p1.mock_calls == [mock.call('data')]
         assert p2.mock_calls == []
-        assert session.add.called
-        assert session.commit.called
+        calls = [
+            mock.call.add(res.model_class()),
+            mock.call.commit(),
+            mock.call.refresh(res.model_class()),
+            mock.call.close()
+        ]
+        assert session.mock_calls == calls
         assert rsp.json == post_data
