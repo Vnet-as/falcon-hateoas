@@ -63,13 +63,13 @@ class ModelCollection:
                     elif op == 'contains':
                         filter.append(column.contains(v))
                 if op == 'lt':
-                    filter.append(column < float(v))
+                    filter.append(column < v)
                 elif op == 'gt':
-                    filter.append(column > float(v))
+                    filter.append(column > v)
                 elif op == 'lte':
-                    filter.append(column <= float(v))
+                    filter.append(column <= v)
                 elif op == 'gte':
-                    filter.append(column >= float(v))
+                    filter.append(column >= v)
         return filter
 
 
