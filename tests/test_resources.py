@@ -88,6 +88,12 @@ class TestModelResource:
         ]
         assert session.mock_calls == calls
 
+    def test_delete(self, app):
+        resp = testing.simulate_delete(app, '/123')
+        assert resp.status_code == 204
+        resp = testing.simulate_delete(app, '/0')
+        assert resp.status_code == 404
+
 
 class TestModelCollection:
     def test_basic_test(self, app):

@@ -103,3 +103,14 @@ class ModelResource:
                     description=('Resource does not contain field'
                                  '"{}"'.format(k)))
         dbsession.commit()
+
+    @db_session
+    def on_delete(self, req, resp, dbsession, **kwargs):
+        res = dbsession.query(self.model_class).filter_by(**kwargs)
+        try:
+            res = res.one()
+        except sqlalchemy.orm.exc.NoResultFound:
+            raise falcon.HTTPNotFound
+        dbsession.delete(res)
+        dbsession.commit()
+        resp.status = falcon.HTTP_NO_CONTENT
